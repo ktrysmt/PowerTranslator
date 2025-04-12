@@ -22,7 +22,7 @@ public class TranslateHelper
         public string toLan;
     }
     public const string toLanSplit = "->";
-    public bool inited => this.translators.Count >= 3 && (this.translators[0] != null || this.translators[1] != null);
+    public bool inited => this.translators.Count >= 4 && (this.translators[0] != null || this.translators[1] != null || this.translators[2] != null); // Check if Google or Youdao is initialized
     private object initLock = new Object();
     private long lastInitTime = 0;
     private IPublicAPI publicAPI;
@@ -30,13 +30,17 @@ public class TranslateHelper
     private List<Type> translatorGenerators;
     private bool isSpeaking = false;
     private bool isIniting = false;
+    private readonly SettingHelper settingHelper;
     public string defaultLanguageKey = "auto";
-    public TranslateHelper(IPublicAPI publicAPI, string defaultLanguageKey = "auto")
+    public TranslateHelper(IPublicAPI publicAPI, SettingHelper settingHelper, string defaultLanguageKey = "auto")
     {
+        this.settingHelper = settingHelper;
+        // Initialize with null for each potential translator
         this.translators = new List<ITranslator?>{
-            null, null, null
+            null, null, null, null // Increased size for Google Translator
         };
         translatorGenerators = new List<Type>{
+            typeof(Service.Google.GoogleTranslator), // Add Google Translator first
             typeof(Service.Youdao.V2.YoudaoTranslator),
             typeof(Service.Youdao.old.YoudaoTranslator),
             typeof(Service.Youdao.Backup.BackUpTranslator)
@@ -197,8 +201,18 @@ public class TranslateHelper
                         return;
                     try
                     {
-                        var tran = tp.GetConstructor(Type.EmptyTypes)?.Invoke(null);
-                        this.translators[idx] = tran as ITranslator;
+                        // If it's GoogleTranslator, pass settingHelper to constructor
+                        if (tp == typeof(Service.Google.GoogleTranslator))
+                        {
+                            var constructor = tp.GetConstructor(new[] { typeof(SettingHelper) });
+                            var tran = constructor?.Invoke(new object[] { settingHelper });
+                            this.translators[idx] = tran as ITranslator;
+                        }
+                        else
+                        {
+                            var tran = tp.GetConstructor(Type.EmptyTypes)?.Invoke(null);
+                            this.translators[idx] = tran as ITranslator;
+                        }
                     }
                     catch (Exception ex)
                     {

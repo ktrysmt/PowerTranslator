@@ -41,6 +41,7 @@ namespace Translator
         public bool enableJumpToDict = false;
         public string dictUtlPattern = dictUrlPatternValues[0];
         public bool useSystemProxy = true;
+        public string googleApiKey = "";
 
         public static List<PluginAdditionalOption> GetAdditionalOptions()
         {
@@ -102,6 +103,14 @@ namespace Translator
                     DisplayDescription = "Use a proxy at request time, default to true",
                     Value = true,
                 },
+                // Google API Key option
+                new PluginAdditionalOption{
+                    Key = "GoogleApiKey",
+                    DisplayLabel = "Google Translate API Key",
+                    DisplayDescription = "Enter your Google Cloud Translation API key here.",
+                    PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Textbox,
+                    Value = "",
+                }
             };
         }
 
@@ -137,6 +146,12 @@ namespace Translator
             var jumpToDict = GetSetting("EnableJumpDictionary");
             enableJumpToDict = jumpToDict.Value;
             dictUtlPattern = dictUrlPatternValues[jumpToDict.ComboBoxValue >= dictUrlPatternValues.Count ? 0 : jumpToDict.ComboBoxValue];
+            // Google API Key
+            var googleApiKeyOption = settings.AdditionalOptions.FirstOrDefault(set => set.Key == "GoogleApiKey");
+            if (googleApiKeyOption != null && googleApiKeyOption.Value is string)
+            {
+                googleApiKey = googleApiKeyOption.Value;
+            }
         }
     }
 }
