@@ -156,4 +156,7 @@ public class GoogleTranslator : ITranslator
         // No need to explicitly reload the API key as it's accessed via property
         Log.Info("GoogleTranslator Reset called.", typeof(GoogleTranslator));
     }
+
+}
+
 }
