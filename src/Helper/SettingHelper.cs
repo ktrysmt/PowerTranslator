@@ -109,7 +109,8 @@ namespace Translator
                     DisplayLabel = "Google Translate API Key",
                     DisplayDescription = "Enter your Google Cloud Translation API key here.",
                     PluginOptionType = PluginAdditionalOption.AdditionalOptionType.Textbox,
-                    Value = "",
+                    Value = false,
+                    TextValue = ""  // Use TextValue for storing the API key
                 }
             };
         }
@@ -147,10 +148,10 @@ namespace Translator
             enableJumpToDict = jumpToDict.Value;
             dictUtlPattern = dictUrlPatternValues[jumpToDict.ComboBoxValue >= dictUrlPatternValues.Count ? 0 : jumpToDict.ComboBoxValue];
             // Google API Key
-            var googleApiKeyOption = settings.AdditionalOptions.FirstOrDefault(set => set.Key == "GoogleApiKey");
-            if (googleApiKeyOption != null && googleApiKeyOption.Value is string)
+            var googleApiKeyOption = GetSetting("GoogleApiKey");
+            if (googleApiKeyOption != null)
             {
-                googleApiKey = googleApiKeyOption.Value;
+                googleApiKey = googleApiKeyOption.TextValue ?? "";
             }
         }
     }

@@ -273,7 +273,7 @@ namespace Translator
             publicAPI = context.API;
             var translaTask = Task.Factory.StartNew(() =>
             {
-                translateHelper = new TranslateHelper(publicAPI, this.settingHelper.defaultLanguageKey);
+                translateHelper = new TranslateHelper(publicAPI, settingHelper, settingHelper.defaultLanguageKey);
             });
             suggestHelper = new Suggest.SuggestHelper(publicAPI);
             historyHelper = new History.HistoryHelper();

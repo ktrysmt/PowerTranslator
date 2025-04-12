@@ -1,14 +1,30 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Web;
 using Translator.Protocol;
 using Translator.Utils;
 using Wox.Plugin.Logger;
 
-namespace Translator.Service.Google;
+namespace Translator.Service.Google
+{
+    public static class DictionaryExtensions
+    {
+        public static string ToQueryString(this Dictionary<string, string> dict)
+        {
+            var query = HttpUtility.ParseQueryString(string.Empty);
+            foreach (var kvp in dict)
+            {
+                query[kvp.Key] = kvp.Value;
+            }
+            return "?" + query.ToString();
+        }
+    }
+
 
 // Represents the response from Google Translate API v2
 public class GoogleTranslateResponse : ITranslateResult
