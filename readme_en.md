@@ -115,6 +115,25 @@ ptr add Translator N0I0C0K/PowerTranslator
 - Toggles the default target translation language, which defaults to 'auto'
   ![languages](Images/languages.png)
 ## Issue
+## Google Translate API Usage
+
+If you set a valid Google Translate API Key in the settings, PowerTranslator will use Google Translate as the primary translation engine. If the key is not set or invalid, it will fall back to Youdao or other available services.
+
+### How to get and set your Google Translate API Key
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/).
+2. Create a new project or select an existing one.
+3. In the left menu, go to "APIs & Services" > "Library".
+4. Search for "Cloud Translation API" and enable it for your project.
+5. Go to "APIs & Services" > "Credentials".
+6. Click "Create credentials" > "API key". Copy the generated API key.
+7. Open PowerToys, go to the PowerTranslator settings, and paste your API key into the "Google Translate API Key" field.
+8. Save the settings and restart PowerToys if necessary.
+
+**Note:**
+- The Google Cloud Translation API is a paid service, but there is a free tier (as of 2025: 500,000 characters/month).
+- If you do not set an API key, PowerTranslator will use Youdao or other fallback services.
+
 
 If you find translation failure, unknown errors, or need new features, please submit an issue. I will fix or improve it in time.
 
