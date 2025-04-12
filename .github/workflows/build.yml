@@ -34,14 +34,21 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Build
+      - name: Build x64
         run: |
-          dotnet build --configuration Release --no-restore
+          dotnet build --configuration Release -p:Platform=x64 --no-restore
 
-      - name: Package
+      - name: Build ARM64
         run: |
-          dotnet pack -p:Platform=x64 --no-build --configuration Release
-          dotnet pack -p:Platform=ARM64 --no-build --configuration Release
+          dotnet build --configuration Release -p:Platform=ARM64 --no-restore
+
+      - name: Package x64
+        run: |
+          dotnet pack --configuration Release -p:Platform=x64 --no-build
+
+      - name: Package ARM64
+        run: |
+          dotnet pack --configuration Release -p:Platform=ARM64 --no-build
 
       # リリース時のみアップロードを実行
       - name: Upload x64 To Release
