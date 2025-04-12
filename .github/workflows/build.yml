@@ -1,7 +1,15 @@
-name: Build on release
+name: Build
 on:
+  workflow_dispatch:  # 手動実行を可能にする
+  push:
+    branches:
+      - main  # mainブランチへのプッシュ時
+    paths:
+      - 'src/**'  # srcディレクトリ配下の変更時
+      - 'plugin.json'  # plugin.jsonの変更時
+      - '.github/workflows/**'  # ワークフロー自体の変更時
   release:
-    types: created
+    types: created  # リリース作成時
 
 jobs:
   build:
@@ -13,6 +21,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.0.x'  # PowerToysのビルドに必要なバージョン
+
       - name: Read version
         run: |
           $json = Get-Content -path .\plugin.json -Raw | ConvertFrom-Json
@@ -23,7 +36,9 @@ jobs:
           dotnet pack -p:Platform=x64
           dotnet pack -p:Platform=ARM64
 
+      # リリース時のみアップロードを実行
       - name: Upload x64 To Release
+        if: github.event_name == 'release'
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
@@ -31,8 +46,19 @@ jobs:
           asset_name: Translator-${{env.PLUGIN_VERSION}}-x64.zip
 
       - name: Upload ARM64 To Release
+        if: github.event_name == 'release'
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{secrets.GITHUB_TOKEN}}
           file: bin/Translator_ARM64.zip
           asset_name: Translator-${{env.PLUGIN_VERSION}}-arm64.zip
+
+      # プッシュ時のみアーティファクトとして保存
+      - name: Upload Build Artifacts
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v3
+        with:
+          name: PowerTranslator-${{env.PLUGIN_VERSION}}
+          path: |
+            bin/Translator_x64.zip
+            bin/Translator_ARM64.zip
