@@ -22,19 +22,28 @@ jobs:
           fetch-depth: 0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '6.0.x'  # PowerToysのビルドに必要なバージョン
+          dotnet-version: |
+            6.0.x
+            7.0.x  # 複数のバージョンをインストール（互換性のため）
 
       - name: Read version
         run: |
           $json = Get-Content -path .\plugin.json -Raw | ConvertFrom-Json
           echo "PLUGIN_VERSION=$($json.Version)" >> $env:GITHUB_ENV
 
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: |
+          dotnet build --configuration Release --no-restore
+
       - name: Package
         run: |
-          dotnet pack -p:Platform=x64
-          dotnet pack -p:Platform=ARM64
+          dotnet pack -p:Platform=x64 --no-build --configuration Release
+          dotnet pack -p:Platform=ARM64 --no-build --configuration Release
 
       # リリース時のみアップロードを実行
       - name: Upload x64 To Release
@@ -56,9 +65,10 @@ jobs:
       # プッシュ時のみアーティファクトとして保存
       - name: Upload Build Artifacts
         if: github.event_name == 'push'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: PowerTranslator-${{env.PLUGIN_VERSION}}
           path: |
             bin/Translator_x64.zip
             bin/Translator_ARM64.zip
+          retention-days: 5  # アーティファクトの保持期間を5日間に設定
