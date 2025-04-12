@@ -24,9 +24,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: |
-            6.0.x
-            7.0.x  # 複数のバージョンをインストール（互換性のため）
+          dotnet-version: 6.0.x  # PowerToysのビルドに必要なバージョン
 
       - name: Read version
         run: |
